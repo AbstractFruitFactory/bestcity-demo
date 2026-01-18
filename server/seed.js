@@ -120,6 +120,44 @@ const seedProducts = [
     numOfReviews: 0,
     reviews: [],
     user: seedUserId
+  },
+  {
+    name: "Skyline Loft Residence",
+    description: "Loft residence with skyline views, open-plan living, and premium amenities.",
+    highlights: ["Open Plan", "Skyline View", "Concierge"],
+    specifications: [
+      { title: "Location", description: "Seattle, WA" },
+      { title: "ROI", description: "6.9%" },
+      { title: "Min Investment", description: "$10" },
+      { title: "Monthly Income", description: "$740" },
+      { title: "Appreciation", description: "5.4%" },
+      { title: "Funded", description: "62%" },
+      { title: "Total Investors", description: "116" },
+      { title: "Available Tokens", description: "42000" },
+      { title: "Token Price", description: "$10" }
+    ],
+    price: 980000,
+    cuttedPrice: 1050000,
+    images: [
+      {
+        public_id: "seed/skyline-loft-residence",
+        url: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&q=80"
+      }
+    ],
+    brand: {
+      name: "BestCity",
+      logo: {
+        public_id: "seed/bestcity-logo",
+        url: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=400&q=80"
+      }
+    },
+    category: "apartment",
+    stock: 98000,
+    warranty: 1,
+    ratings: 0,
+    numOfReviews: 0,
+    reviews: [],
+    user: seedUserId
   }
 ];
 
