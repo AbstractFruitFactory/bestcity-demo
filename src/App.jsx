@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -13,10 +14,30 @@ import BlogPost from './pages/BlogPost';
 import NotFound from './pages/NotFound';
 
 function App() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = savedTheme === 'dark';
+    setIsDarkMode(prefersDark);
+    document.documentElement.classList.toggle('dark', prefersDark);
+    document.body.classList.toggle('dark', prefersDark);
+  }, []);
+
+  const handleToggleTheme = () => {
+    setIsDarkMode((prev) => {
+      const nextValue = !prev;
+      localStorage.setItem('theme', nextValue ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', nextValue);
+      document.body.classList.toggle('dark', nextValue);
+      return nextValue;
+    });
+  };
+
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
+      <div className="min-h-screen flex flex-col bg-secondary-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">
+        <Navbar isDarkMode={isDarkMode} onToggleTheme={handleToggleTheme} />
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />

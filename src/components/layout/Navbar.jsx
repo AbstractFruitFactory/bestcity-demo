@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { FiMenu, FiX, FiMoon, FiSun } from 'react-icons/fi';
 
-function Navbar() {
+function Navbar({ isDarkMode, onToggleTheme }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigation = [
@@ -14,7 +14,7 @@ function Navbar() {
   ];
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm dark:bg-secondary-900 dark:border-b dark:border-secondary-800">
       <div className="container">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -33,11 +33,19 @@ function Navbar() {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-secondary-600 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+                className="text-secondary-600 hover:text-primary-600 px-3 py-2 text-sm font-medium dark:text-secondary-200 dark:hover:text-primary-400"
               >
                 {item.name}
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="text-secondary-600 hover:text-primary-600 px-3 py-2 text-sm font-medium dark:text-secondary-200 dark:hover:text-primary-400"
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
+            </button>
             <button
               className="btn"
             >
@@ -65,12 +73,23 @@ function Navbar() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="block px-3 py-2 text-base font-medium text-secondary-600 hover:text-primary-600 hover:bg-primary-50"
+                  className="block px-3 py-2 text-base font-medium text-secondary-600 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
+              <button
+                type="button"
+                className="w-full flex items-center px-3 py-2 text-base font-medium text-secondary-600 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
+                onClick={() => {
+                  onToggleTheme();
+                  setIsOpen(false);
+                }}
+              >
+                {isDarkMode ? <FiSun size={18} className="mr-2" /> : <FiMoon size={18} className="mr-2" />}
+                {isDarkMode ? 'Light mode' : 'Dark mode'}
+              </button>
               <button
                 className="block px-3 py-2 text-base font-medium text-white bg-primary-600 hover:bg-primary-700"
                 onClick={() => setIsOpen(false)}
