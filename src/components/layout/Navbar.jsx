@@ -54,11 +54,12 @@ function Navbar({ isDarkMode, onToggleTheme }) {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center md:hidden pr-2">
             <button
               type="button"
-              className="text-secondary-600 hover:text-primary-600"
+              className="text-secondary-600 hover:text-primary-600 dark:text-secondary-200 dark:hover:text-primary-400"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
             >
               {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
@@ -66,14 +67,33 @@ function Navbar({ isDarkMode, onToggleTheme }) {
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden">
-            <div className="pt-2 pb-3 space-y-1">
+        <div className={`md:hidden ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+          <div
+            className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-lg transform transition-transform duration-200 ${
+              isOpen ? 'translate-x-0' : '-translate-x-full'
+            } dark:bg-secondary-900 dark:border-r dark:border-secondary-800`}
+          >
+            <div className="flex items-center justify-between px-4 h-16 border-b border-secondary-100 dark:border-secondary-800">
+              <span className="text-lg font-semibold text-primary-600">Menu</span>
+              <button
+                type="button"
+                className="text-secondary-600 hover:text-primary-600 dark:text-secondary-200 dark:hover:text-primary-400"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close menu"
+              >
+                <FiX size={22} />
+              </button>
+            </div>
+            <div className="pt-2 pb-4 space-y-1 px-2">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="block px-3 py-2 text-base font-medium text-secondary-600 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
+                  className="block rounded-md px-3 py-2 text-base font-medium text-secondary-700 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
@@ -81,24 +101,23 @@ function Navbar({ isDarkMode, onToggleTheme }) {
               ))}
               <button
                 type="button"
-                className="w-full flex items-center px-3 py-2 text-base font-medium text-secondary-600 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
+                className="w-full flex items-center rounded-md px-3 py-2 text-base font-medium text-secondary-700 hover:text-primary-600 hover:bg-primary-50 dark:text-secondary-200 dark:hover:text-primary-400 dark:hover:bg-secondary-800"
                 onClick={() => {
                   onToggleTheme();
-                  setIsOpen(false);
                 }}
               >
                 {isDarkMode ? <FiSun size={18} className="mr-2" /> : <FiMoon size={18} className="mr-2" />}
                 {isDarkMode ? 'Light mode' : 'Dark mode'}
               </button>
               <button
-                className="block px-3 py-2 text-base font-medium text-white bg-primary-600 hover:bg-primary-700"
+                className="w-full mt-2 px-3 py-2 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
                 onClick={() => setIsOpen(false)}
               >
                 Connect
               </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
