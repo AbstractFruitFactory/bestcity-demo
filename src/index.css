@@ -7,10 +7,12 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
   
   body {
     @apply font-sans text-secondary-800 bg-secondary-50 dark:text-secondary-100 dark:bg-secondary-900;
+    overflow-x: hidden;
   }
 }
 
@@ -34,6 +36,7 @@
   .card {
     @apply bg-white rounded-lg shadow-md overflow-hidden dark:bg-secondary-800 dark:shadow-none;
   }
+
 
   .dark .bg-white {
     @apply bg-secondary-900;

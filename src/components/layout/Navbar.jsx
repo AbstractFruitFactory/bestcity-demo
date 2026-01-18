@@ -14,7 +14,15 @@ function Navbar({ isDarkMode, onToggleTheme }) {
   ];
 
   return (
-    <nav className="bg-white shadow-sm dark:bg-secondary-900 dark:border-b dark:border-secondary-800">
+    <nav className="bg-white shadow-sm dark:bg-secondary-900 dark:border-b dark:border-secondary-800 md:static fixed top-0 inset-x-0 z-50 h-16 md:h-auto">
+      <Popup
+        isOpen={showInstallPrompt}
+        title="MetaMask not detected"
+        description="Install MetaMask to connect your Ethereum wallet."
+        primaryLabel="Install MetaMask"
+        onPrimary={handleInstallMetaMask}
+        onClose={() => setShowInstallPrompt(false)}
+      />
       <div className="container">
         <div className="flex justify-between h-16">
           <div className="flex">
