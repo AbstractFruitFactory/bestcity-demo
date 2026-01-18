@@ -1,9 +1,53 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiMenu, FiX, FiMoon, FiSun } from 'react-icons/fi';
+import { useWalletContext } from '../../context/WalletContext';
+import Popup from '../common/Popup';
+
+const formatAddress = (address = '') => {
+  if (!address) return '';
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+const getNetworkLabel = (chainId = '') => {
+  const networkMap = {
+    '0x1': 'Ethereum',
+    '0x5': 'Goerli',
+    '0xaa36a7': 'Sepolia',
+    '0x89': 'Polygon',
+    '0x13881': 'Mumbai',
+    '0xa': 'Optimism',
+    '0xa4b1': 'Arbitrum',
+    '0x38': 'BSC'
+  };
+  if (!chainId) return 'Unknown';
+  return networkMap[chainId] || `Chain ${chainId}`;
+};
 
 function Navbar({ isDarkMode, onToggleTheme }) {
   const [isOpen, setIsOpen] = useState(false);
+  const {
+    address: walletAddress,
+    chainId: walletChainId,
+    isConnected: isWalletConnected,
+    providerAvailable: walletAvailable,
+    isConnecting: isWalletConnecting,
+    connectWallet: onConnectWallet
+  } = useWalletContext();
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+
+  const handleConnectClick = () => {
+    if (!walletAvailable) {
+      setShowInstallPrompt(true);
+      return;
+    }
+    onConnectWallet();
+  };
+
+  const handleInstallMetaMask = () => {
+    setShowInstallPrompt(false);
+    window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer');
+  };
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -54,11 +98,33 @@ function Navbar({ isDarkMode, onToggleTheme }) {
             >
               {isDarkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
             </button>
-            <button
-              className="btn"
-            >
-              Connect
-            </button>
+            {isWalletConnected ? (
+              <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-secondary-700 dark:text-secondary-200">
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+                <span>{formatAddress(walletAddress)}</span>
+                <span className="rounded-full bg-secondary-100 px-2 py-0.5 text-xs font-semibold text-secondary-600 dark:bg-secondary-800 dark:text-secondary-300">
+                  {getNetworkLabel(walletChainId)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-end">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleConnectClick}
+                  disabled={isWalletConnecting}
+                >
+                  {isWalletConnecting ? (
+                    <span className="flex items-center">
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Connecting
+                    </span>
+                  ) : (
+                    'Connect'
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -117,12 +183,33 @@ function Navbar({ isDarkMode, onToggleTheme }) {
                 {isDarkMode ? <FiSun size={18} className="mr-2" /> : <FiMoon size={18} className="mr-2" />}
                 {isDarkMode ? 'Light mode' : 'Dark mode'}
               </button>
-              <button
-                className="w-full mt-2 px-3 py-2 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
-                onClick={() => setIsOpen(false)}
-              >
-                Connect
-              </button>
+              {isWalletConnected ? (
+                <div className="mt-2 flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-secondary-700 dark:text-secondary-200">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                  <span>{formatAddress(walletAddress)}</span>
+                  <span className="rounded-full bg-secondary-100 px-2 py-0.5 text-xs font-semibold text-secondary-600 dark:bg-secondary-800 dark:text-secondary-300">
+                    {getNetworkLabel(walletChainId)}
+                  </span>
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    className="w-full px-3 py-2 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md"
+                    onClick={handleConnectClick}
+                    disabled={isWalletConnecting}
+                  >
+                    {isWalletConnecting ? (
+                      <span className="flex items-center justify-center">
+                        <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Connecting
+                      </span>
+                    ) : (
+                      'Connect'
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
