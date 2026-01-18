@@ -5,6 +5,9 @@ import { FiHome, FiMaximize2, FiCalendar, FiTrendingUp, FiUsers, FiDollarSign, F
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 import { FaFacebook, FaTwitter, FaLinkedin, FaEthereum, FaWallet } from 'react-icons/fa';
 import { mapProductToProperty } from '../utils/propertyMapper';
+import { useWalletContext } from '../context/WalletContext';
+import { useContractContext } from '../context/ContractContext';
+import StatusPopup from '../components/common/StatusPopup';
 
 function PropertyDetail() {
   const { id } = useParams();
@@ -59,6 +62,14 @@ function PropertyDetail() {
   const [property, setProperty] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [investAmount, setInvestAmount] = useState('10');
+  const {
+    address: walletAddress,
+    isConnected: isWalletConnected,
+    providerAvailable: walletAvailable,
+    isConnecting: isWalletConnecting,
+    connectWallet: onConnectWallet
+  } = useWalletContext();
 
   useEffect(() => {
     let isMounted = true;
@@ -107,6 +118,62 @@ function PropertyDetail() {
       isMounted = false;
     };
   }, [id]);
+
+  const {
+    totalInvested,
+    userInvested,
+    contractAddress,
+    isInvesting,
+    statusPopup,
+    invest,
+    showStatus,
+    closeStatus,
+    setContractScope
+  } = useContractContext();
+
+  useEffect(() => {
+    setContractScope({
+      propertyId: id,
+      investor: isWalletConnected ? walletAddress : ''
+    });
+  }, [id, isWalletConnected, setContractScope, walletAddress]);
+
+  const handleInvest = async () => {
+    if (!walletAvailable) {
+      showStatus({
+        status: 'error',
+        title: 'Wallet not found',
+        message: 'Install MetaMask to continue.'
+      });
+      return;
+    }
+    if (!isWalletConnected) {
+      onConnectWallet();
+      return;
+    }
+    if (!investAmount) {
+      showStatus({
+        status: 'error',
+        title: 'Amount required',
+        message: 'Enter an amount to invest.'
+      });
+      return;
+    }
+    if (!contractAddress) {
+      showStatus({
+        status: 'error',
+        title: 'Contract not ready',
+        message: 'Please try again in a moment.'
+      });
+      return;
+    }
+
+    await invest({
+      propertyId: id,
+      investor: walletAddress,
+      amount: investAmount
+    });
+  };
 
   const shareUrl = window.location.href;
 
@@ -339,10 +406,33 @@ function PropertyDetail() {
                 View 3D version
               </Link>
 
-              <button className="btn w-full mb-4 flex items-center justify-center">
-                <FaWallet className="mr-2" />
-                Connect Wallet to Invest
-              </button>
+              <div className="mb-4 rounded-lg border border-secondary-100 p-4 dark:border-secondary-800">
+                <div className="flex items-center justify-between text-sm text-secondary-600 dark:text-secondary-300">
+                  <span>Total invested</span>
+                  <span className="font-medium text-secondary-800 dark:text-secondary-100">{totalInvested}</span>
+                </div>
+                <div className="mt-1 flex items-center justify-between text-sm text-secondary-600 dark:text-secondary-300">
+                  <span>Your investment</span>
+                  <span className="font-medium text-secondary-800 dark:text-secondary-100">{userInvested}</span>
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <input
+                    type="number"
+                    min="1"
+                    className="input"
+                    value={investAmount}
+                    onChange={(event) => setInvestAmount(event.target.value)}
+                  />
+                  <button
+                    className="btn flex items-center justify-center"
+                    onClick={handleInvest}
+                    disabled={isInvesting || isWalletConnecting}
+                  >
+                    <FaWallet className="mr-2" />
+                    {isWalletConnected ? (isInvesting ? 'Investing...' : 'Invest') : 'Connect Wallet to Invest'}
+                  </button>
+                </div>
+              </div>
               
               <div className="flex items-center justify-center space-x-4 pt-4 border-t">
                 <FacebookShareButton url={shareUrl}>
@@ -385,6 +475,13 @@ function PropertyDetail() {
           </motion.div>
         </div>
       </div>
+      <StatusPopup
+        isOpen={statusPopup.isOpen}
+        status={statusPopup.status}
+        title={statusPopup.title}
+        message={statusPopup.message}
+        onClose={closeStatus}
+      />
     </div>
   );
 }

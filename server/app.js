@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const userRouter = require("./routes/userRoute");
 const productRouter = require("./routes/productRoute");
+const contractRouter = require("./routes/contractRoute");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/user', userRouter);
 app.use('/api', productRouter);
+app.use('/api', contractRouter);
 app.use(fileUpload());
 
 // deployment

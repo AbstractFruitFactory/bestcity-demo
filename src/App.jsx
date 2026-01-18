@@ -13,6 +13,7 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import NotFound from './pages/NotFound';
 import { WalletProvider } from './context/WalletContext';
+import { ContractProvider } from './context/ContractContext';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -36,26 +37,28 @@ function App() {
 
   return (
     <WalletProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-secondary-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">
-          <Navbar isDarkMode={isDarkMode} onToggleTheme={handleToggleTheme} />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/properties" element={<Properties />} />
-              <Route path="/properties/:id" element={<PropertyDetail />} />
-              <Route path="/property-3d" element={<Property3D />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path = '*' element={<NotFound/>} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <ContractProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col bg-secondary-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">
+            <Navbar isDarkMode={isDarkMode} onToggleTheme={handleToggleTheme} />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/properties/:id" element={<PropertyDetail />} />
+                <Route path="/property-3d" element={<Property3D />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </ContractProvider>
     </WalletProvider>
   );
 }
