@@ -1,67 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowRight, FiUser, FiClock } from 'react-icons/fi';
 import { FaWallet, FaStore, FaMoneyBillWave, FaExchangeAlt, FaChartLine, FaLock, FaUserCog, FaCoins } from 'react-icons/fa';
 import { SiEthereum } from 'react-icons/si';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { mapProductToProperty } from '../utils/propertyMapper';
 
 function Home() {
   const [openSections, setOpenSections] = useState({});
+  const [featuredProperties, setFeaturedProperties] = useState([]);
 
-  const featuredProperties = [
-    {
-      id: 1,
-      title: 'Luxury Downtown Apartment',
-      price: {
-        usd: 850000,
-        eth: 425, // Example ETH value
-      },
-      location: 'Miami, FL',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-      roi: '7.2% Annual',
-      metrics: {
-        totalInvestors: 142,
-        funded: '89%',
-        minInvestment: '$10',
-      },
-      status: 'Active Investment'
-    },
-    {
-      id: 2,
-      title: 'Modern Tech District Complex',
-      price: {
-        usd: 1200000,
-        eth: 600,
-      },
-      location: 'Austin, TX',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
-      roi: '6.8% Annual',
-      metrics: {
-        totalInvestors: 203,
-        funded: '95%',
-        minInvestment: '$10',
-      },
-      status: 'Almost Funded'
-    },
-    {
-      id: 3,
-      title: 'Waterfront Commercial Space',
-      price: {
-        usd: 2100000,
-        eth: 1050,
-      },
-      location: 'Seattle, WA',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
-      roi: '7.5% Annual',
-      metrics: {
-        totalInvestors: 89,
-        funded: '45%',
-        minInvestment: '$10',
-      },
-      status: 'New Listing'
-    }
-  ];
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFeatured = async () => {
+      try {
+        const response = await fetch('/api/products/all');
+        if (!response.ok) {
+          throw new Error('Failed to load properties');
+        }
+        const data = await response.json();
+        const mapped = (data?.products || []).map(mapProductToProperty).slice(0, 3);
+        if (isMounted) {
+          setFeaturedProperties(mapped);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setFeaturedProperties([]);
+        }
+      }
+    };
+
+    loadFeatured();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const advantages = [
     {

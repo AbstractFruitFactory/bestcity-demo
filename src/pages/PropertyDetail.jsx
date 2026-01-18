@@ -1,33 +1,19 @@
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHome, FiMaximize2, FiCalendar, FiTrendingUp, FiUsers, FiDollarSign, FiGrid } from 'react-icons/fi';
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 import { FaFacebook, FaTwitter, FaLinkedin, FaEthereum, FaWallet } from 'react-icons/fa';
+import { mapProductToProperty } from '../utils/propertyMapper';
 
 function PropertyDetail() {
   const { id } = useParams();
 
-  const property = {
-    id: parseInt(id),
-    title: 'Modern Villa with Pool',
-    price: {
-      usd: 850000,
-      eth: 425
-    },
-    location: 'Beverly Hills, CA',
-    type: 'villa',
-    roi: '7.2%',
+  const detailDefaults = {
     metrics: {
-      totalInvestors: 142,
-      funded: '89%',
-      minInvestment: '$10',
-      monthlyIncome: '$520',
-      appreciation: '4.5%',
       rentalYield: '5.8%',
       totalReturn: '10.3%'
     },
-    status: 'Active Investment',
-    description: 'This stunning modern villa offers luxurious living spaces with high-end finishes throughout. The property has been tokenized for fractional ownership, allowing investors to participate in this premium real estate opportunity with as little as $10.',
     features: [
       'Swimming Pool',
       'Smart Home System',
@@ -39,9 +25,6 @@ function PropertyDetail() {
       'Three-Car Garage'
     ],
     tokenDetails: {
-      totalTokens: 85000,
-      availableTokens: 9350,
-      tokenPrice: '$10',
       tokenSymbol: 'VILLA425',
       contractAddress: '0x1234...5678',
       blockchain: 'Ethereum'
@@ -73,7 +56,75 @@ function PropertyDetail() {
     }
   };
 
+  const [property, setProperty] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProperty = async () => {
+      setIsLoading(true);
+      setErrorMessage('');
+      try {
+        const response = await fetch(`/api/product/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to load property');
+        }
+        const data = await response.json();
+        const mappedProperty = mapProductToProperty(data?.product);
+        const mergedProperty = {
+          ...detailDefaults,
+          ...mappedProperty,
+          metrics: {
+            ...detailDefaults.metrics,
+            ...mappedProperty.metrics
+          },
+          tokenDetails: {
+            ...detailDefaults.tokenDetails,
+            ...mappedProperty.tokenDetails
+          },
+          images: mappedProperty.images?.length ? mappedProperty.images : detailDefaults.images,
+          features: mappedProperty.features?.length ? mappedProperty.features : detailDefaults.features
+        };
+        if (isMounted) {
+          setProperty(mergedProperty);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage('Failed to load property');
+          setProperty(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadProperty();
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
   const shareUrl = window.location.href;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center text-secondary-600">
+        Loading property...
+      </div>
+    );
+  }
+
+  if (errorMessage || !property) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center text-red-500">
+        {errorMessage || 'Property not found'}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary-50">
@@ -252,7 +303,7 @@ function PropertyDetail() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-secondary-600">Rental Yield</span>
-                  <span className="font-medium">{property.metrics.rentalYield}</span>
+                  <span className="font-medium">{property.metrics.rentalYield || '-'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary-600">Appreciation</span>
@@ -260,7 +311,7 @@ function PropertyDetail() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary-600">Total Return</span>
-                  <span className="font-medium text-green-600">{property.metrics.totalReturn}</span>
+                  <span className="font-medium text-green-600">{property.metrics.totalReturn || '-'}</span>
                 </div>
               </div>
 

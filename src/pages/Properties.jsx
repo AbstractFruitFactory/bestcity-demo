@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiFilter, FiArrowRight, FiTrendingUp, FiDollarSign } from 'react-icons/fi';
 import { FaEthereum } from 'react-icons/fa';
+import { mapProductToProperty } from '../utils/propertyMapper';
 
 function Properties() {
   const [showFilters, setShowFilters] = useState(false);
+  const [properties, setProperties] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [filters, setFilters] = useState({
     priceRange: 'all',
     propertyType: 'all',
@@ -16,86 +20,39 @@ function Properties() {
     sortBy: 'newest'
   });
 
-  const properties = [
-    {
-      id: 1,
-      title: 'Modern Villa with Pool',
-      price: {
-        usd: 850000,
-        eth: 425
-      },
-      location: 'Beverly Hills, CA',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-      type: 'villa',
-      roi: '7.2%',
-      metrics: {
-        totalInvestors: 142,
-        funded: '89%',
-        minInvestment: '$10',
-        monthlyIncome: '$520',
-        appreciation: '4.5%'
-      },
-      status: 'Active Investment',
-      features: ['Pool', 'Smart Home', 'Solar Panels'],
-      tokenDetails: {
-        totalTokens: 85000,
-        availableTokens: 9350,
-        tokenPrice: '$10'
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProperties = async () => {
+      setIsLoading(true);
+      setErrorMessage('');
+      try {
+        const response = await fetch('/api/products/all');
+        if (!response.ok) {
+          throw new Error('Failed to load properties');
+        }
+        const data = await response.json();
+        const mappedProperties = (data?.products || []).map(mapProductToProperty);
+        if (isMounted) {
+          setProperties(mappedProperties);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage('Failed to load properties');
+          setProperties([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-    },
-    {
-      id: 2,
-      title: 'Luxury Penthouse',
-      price: {
-        usd: 1200000,
-        eth: 600
-      },
-      location: 'Manhattan, NY',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
-      type: 'apartment',
-      roi: '6.8%',
-      metrics: {
-        totalInvestors: 203,
-        funded: '95%',
-        minInvestment: '$10',
-        monthlyIncome: '$680',
-        appreciation: '5.2%'
-      },
-      status: 'Almost Funded',
-      features: ['Doorman', 'Gym', 'Terrace'],
-      tokenDetails: {
-        totalTokens: 120000,
-        availableTokens: 6000,
-        tokenPrice: '$10'
-      }
-    },
-    {
-      id: 3,
-      title: 'Waterfront Estate',
-      price: {
-        usd: 2100000,
-        eth: 1050
-      },
-      location: 'Miami Beach, FL',
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
-      type: 'house',
-      roi: '7.5%',
-      metrics: {
-        totalInvestors: 89,
-        funded: '45%',
-        minInvestment: '$10',
-        monthlyIncome: '$1200',
-        appreciation: '6.1%'
-      },
-      status: 'New Listing',
-      features: ['Waterfront', 'Dock', 'Wine Cellar'],
-      tokenDetails: {
-        totalTokens: 210000,
-        availableTokens: 115500,
-        tokenPrice: '$10'
-      }
-    }
-  ];
+    };
+
+    loadProperties();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -271,6 +228,15 @@ function Properties() {
       {/* Properties Grid */}
       <div className="container py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {isLoading && (
+            <div className="col-span-full text-center text-secondary-600">Loading properties...</div>
+          )}
+          {!isLoading && errorMessage && (
+            <div className="col-span-full text-center text-red-500">{errorMessage}</div>
+          )}
+          {!isLoading && !errorMessage && sortedProperties.length === 0 && (
+            <div className="col-span-full text-center text-secondary-600">No properties available.</div>
+          )}
           {sortedProperties.map((property, index) => (
             <motion.div
               key={property.id}

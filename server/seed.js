@@ -14,7 +14,13 @@ const seedProducts = [
     specifications: [
       { title: "Location", description: "Beverly Hills, CA" },
       { title: "ROI", description: "7.2%" },
-      { title: "Min Investment", description: "$10" }
+      { title: "Min Investment", description: "$10" },
+      { title: "Monthly Income", description: "$520" },
+      { title: "Appreciation", description: "4.5%" },
+      { title: "Funded", description: "89%" },
+      { title: "Total Investors", description: "142" },
+      { title: "Available Tokens", description: "9350" },
+      { title: "Token Price", description: "$10" }
     ],
     price: 850000,
     cuttedPrice: 900000,
@@ -46,7 +52,13 @@ const seedProducts = [
     specifications: [
       { title: "Location", description: "Manhattan, NY" },
       { title: "ROI", description: "6.8%" },
-      { title: "Min Investment", description: "$10" }
+      { title: "Min Investment", description: "$10" },
+      { title: "Monthly Income", description: "$680" },
+      { title: "Appreciation", description: "5.2%" },
+      { title: "Funded", description: "95%" },
+      { title: "Total Investors", description: "203" },
+      { title: "Available Tokens", description: "6000" },
+      { title: "Token Price", description: "$10" }
     ],
     price: 1200000,
     cuttedPrice: 1280000,
@@ -78,7 +90,13 @@ const seedProducts = [
     specifications: [
       { title: "Location", description: "Miami Beach, FL" },
       { title: "ROI", description: "7.5%" },
-      { title: "Min Investment", description: "$10" }
+      { title: "Min Investment", description: "$10" },
+      { title: "Monthly Income", description: "$1200" },
+      { title: "Appreciation", description: "6.1%" },
+      { title: "Funded", description: "45%" },
+      { title: "Total Investors", description: "89" },
+      { title: "Available Tokens", description: "115500" },
+      { title: "Token Price", description: "$10" }
     ],
     price: 2100000,
     cuttedPrice: 2200000,

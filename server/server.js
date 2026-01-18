@@ -1,6 +1,7 @@
 const app = require('./app');
 const connectDatabase = require('./config/database');
 const cloudinary = require('cloudinary');
+require("dotenv").config({ path: "server/config/config.env" });
 const PORT = process.env.PORT || 3099;
 
 // UncaughtException Error
