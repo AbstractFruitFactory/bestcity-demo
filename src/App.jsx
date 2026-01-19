@@ -41,7 +41,7 @@ function App() {
         <Router>
           <div className="min-h-screen flex flex-col bg-secondary-50 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">
             <Navbar isDarkMode={isDarkMode} onToggleTheme={handleToggleTheme} />
-            <main className="flex-grow">
+            <main className="flex-grow pt-16 md:pt-0">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/properties" element={<Properties />} />
